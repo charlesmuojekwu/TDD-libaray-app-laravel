@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class BookReservationTest extends TestCase
+class BookManagementTest extends TestCase
 {
 
     use RefreshDatabase; // run migratio and tears down DB after every test
@@ -26,9 +26,13 @@ class BookReservationTest extends TestCase
             'author' => 'Charles'
         ]);
 
-        $response->assertOk();
+        $book = Book::first();
+
+        //$response->assertOk();
 
         $this->assertCount(1, Book::all());
+
+        $response->assertRedirect($book->path());
     }
 
     /** @test */
@@ -56,6 +60,7 @@ class BookReservationTest extends TestCase
              'author' => ''
          ]);
 
+
          $response->assertSessionHasErrors('author');
 
     }
@@ -66,7 +71,7 @@ class BookReservationTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->post('/books', [
+        $this->post('/books', [
             'title' => 'cool book title',
             'author' => 'Charles'
         ]);
@@ -75,7 +80,7 @@ class BookReservationTest extends TestCase
         $book = Book::first();
 
 
-        $this->patch('/book/'.$book->id, [
+        $response = $this->patch('/book/'.$book->id, [
             'title' => 'My books',
             'author' => 'john lengend'
         ]);
@@ -83,5 +88,27 @@ class BookReservationTest extends TestCase
         $this->assertEquals('My books', Book::first()->title);
         $this->assertEquals('john lengend', Book::first()->author);
 
+        $response->assertRedirect($book->path());
+
+    }
+
+
+    /** @test */
+    public function a_book_can_be_deleted()
+    {
+       $this->post('/books', [
+            'title' => 'cool book title',
+            'author' => 'Charles'
+        ]);
+
+
+        $book = Book::first();
+        $this->assertCount(1, Book::all());
+
+
+        $result = $this->delete('/delete/'.$book->id);
+
+        $this->assertCount(0, Book::all());
+        $result->assertRedirect('/books');
     }
 }

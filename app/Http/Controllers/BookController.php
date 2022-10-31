@@ -17,10 +17,12 @@ class BookController extends Controller
         //     'author' => $request->author
         // ]);
 
-        Book::create([
+        $book = Book::create([
             'title' => $data['title'],
             'author' => $data['author']
         ]);
+
+        return redirect($book->path());
     }
 
 
@@ -28,6 +30,16 @@ class BookController extends Controller
     {
         $data = $this->validateRequest();
         $book->update($data);
+
+        return redirect($book->path());
+    }
+
+
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return redirect('/books');
     }
 
 
