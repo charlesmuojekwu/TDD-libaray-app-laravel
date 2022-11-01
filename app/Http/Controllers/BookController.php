@@ -19,7 +19,7 @@ class BookController extends Controller
 
         $book = Book::create([
             'title' => $data['title'],
-            'author' => $data['author']
+            'author_id' => $data['author_id']
         ]);
 
         return redirect($book->path());
@@ -47,7 +47,7 @@ class BookController extends Controller
     {
         return  request()->validate([
             'title' => 'required',
-            'author' => 'required'
+            'author_id' => 'required'
         ]);
     }
 }
